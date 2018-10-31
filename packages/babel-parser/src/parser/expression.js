@@ -804,7 +804,7 @@ export default class ExpressionParser extends LValParser {
           this.state.yieldInPossibleArrowParameters = null;
           const params = [this.parseIdentifier()];
           this.expect(tt.arrow);
-          // let foo = bar => {};
+          // let foo = async bar => {};
           this.parseArrowExpression(node, params, true);
           this.state.yieldInPossibleArrowParameters = oldYield;
           return node;
@@ -1163,6 +1163,14 @@ export default class ExpressionParser extends LValParser {
     if (this.eat(tt.arrow)) {
       return node;
     }
+  }
+
+  parseExpressionParenItem(
+    node: N.Expression,
+    startPos: number, // eslint-disable-line no-unused-vars
+    startLoc: Position, // eslint-disable-line no-unused-vars
+  ): N.Expression {
+    return node;
   }
 
   parseParenItem(
@@ -1812,7 +1820,7 @@ export default class ExpressionParser extends LValParser {
     } else if (this.match(tt.ellipsis)) {
       const spreadNodeStartPos = this.state.start;
       const spreadNodeStartLoc = this.state.startLoc;
-      elt = this.parseParenItem(
+      elt = this.parseExpressionParenItem(
         this.parseSpread(refShorthandDefaultPos, refNeedsArrowPos),
         spreadNodeStartPos,
         spreadNodeStartLoc,
@@ -1825,7 +1833,7 @@ export default class ExpressionParser extends LValParser {
       elt = this.parseMaybeAssign(
         false,
         refShorthandDefaultPos,
-        this.parseParenItem,
+        this.parseExpressionParenItem,
         refNeedsArrowPos,
       );
     }

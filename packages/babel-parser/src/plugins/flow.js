@@ -1756,12 +1756,11 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       return result;
     }
 
-    parseParenItem(
+    flowTryParseOptionalTypeCastExpression(
       node: N.Expression,
       startPos: number,
       startLoc: Position,
     ): N.Expression {
-      node = super.parseParenItem(node, startPos, startLoc);
       if (this.eat(tt.question)) {
         node.optional = true;
       }
@@ -1775,6 +1774,36 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       }
 
       return node;
+    }
+
+    parseExpressionParenItem(
+      node: N.Expression,
+      startPos: number,
+      startLoc: Position,
+    ): N.Expression {
+      node = this.flowTryParseOptionalTypeCastExpression(
+        super.parseParenItem(node, startPos, startLoc),
+        startPos,
+        startLoc,
+      );
+
+      if (node.type === "TypeCastExpression") {
+        node._exprListItem = true;
+      }
+
+      return node;
+    }
+
+    parseParenItem(
+      node: N.Expression,
+      startPos: number,
+      startLoc: Position,
+    ): N.Expression {
+      return this.flowTryParseOptionalTypeCastExpression(
+        super.parseParenItem(node, startPos, startLoc),
+        startPos,
+        startLoc,
+      );
     }
 
     assertModuleNodeAllowed(node: N.Node) {
@@ -1932,34 +1961,14 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       for (let i = 0; i < exprList.length; i++) {
         const expr = exprList[i];
         if (expr && expr._exprListItem && expr.type === "TypeCastExpression") {
-          this.raise(expr.start, "Unexpected type cast");
+          this.raise(
+            expr.start,
+            "The type cast expression is expected to be wrapped with parenthesis",
+          );
         }
       }
 
       return exprList;
-    }
-
-    // parse an item inside a expression list eg. `(NODE, NODE)` where NODE represents
-    // the position where this function is called
-    parseExprListItem(
-      allowEmpty: ?boolean,
-      refShorthandDefaultPos: ?Pos,
-      refNeedsArrowPos: ?Pos,
-    ): ?N.Expression {
-      const container = this.startNode();
-      const node = super.parseExprListItem(
-        allowEmpty,
-        refShorthandDefaultPos,
-        refNeedsArrowPos,
-      );
-      if (this.match(tt.colon)) {
-        container._exprListItem = true;
-        container.expression = node;
-        container.typeAnnotation = this.flowParseTypeAnnotation();
-        return this.finishNode(container, "TypeCastExpression");
-      } else {
-        return node;
-      }
     }
 
     checkLVal(
@@ -2494,9 +2503,27 @@ export default (superClass: Class<Parser>): Class<Parser> =>
     }
 
     parseParenAndDistinguishExpression(canBeArrow: boolean): N.Expression {
-      return super.parseParenAndDistinguishExpression(
+      const list = super.parseParenAndDistinguishExpression(
         canBeArrow && this.state.noArrowAt.indexOf(this.state.start) === -1,
       );
+
+      // Ensure that TypeCastExpressions without parens are not allowed inside SequenceExpressions
+      // e.g. (A, B: T)
+      if (list.type === "SequenceExpression") {
+        const firstTypeCast = list.expressions.find(
+          ({ type, extra }) =>
+            type === "TypeCastExpression" &&
+            (!extra || extra.parenthesized !== true),
+        );
+        if (firstTypeCast) {
+          this.unexpected(
+            firstTypeCast.typeAnnotation.start,
+            "The type cast expression is expected to be wrapped with parenthesis",
+          );
+        }
+      }
+
+      return list;
     }
 
     parseSubscripts(

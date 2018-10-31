@@ -1716,14 +1716,11 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       }
     }
 
-    // Note: These "type casts" are *not* valid TS expressions.
-    // But we parse them here and change them when completing the arrow function.
-    parseParenItem(
+    tsTryParseParamType(
       node: N.Expression,
       startPos: number,
       startLoc: Position,
     ): N.Expression {
-      node = super.parseParenItem(node, startPos, startLoc);
       if (this.eat(tt.question)) {
         node.optional = true;
       }
@@ -1740,6 +1737,34 @@ export default (superClass: Class<Parser>): Class<Parser> =>
       }
 
       return node;
+    }
+
+    // Note: These "type casts" are *not* valid TS expressions.
+    // But we parse them here and change them when completing the arrow function.
+    parseExpressionParenItem(
+      node: N.Expression,
+      startPos: number,
+      startLoc: Position,
+    ): N.Expression {
+      return this.tsTryParseParamType(
+        super.parseParenItem(node, startPos, startLoc),
+        startPos,
+        startLoc,
+      );
+    }
+
+    // Note: These "type casts" are *not* valid TS expressions.
+    // But we parse them here and change them when completing the arrow function.
+    parseParenItem(
+      node: N.Expression,
+      startPos: number,
+      startLoc: Position,
+    ): N.Expression {
+      return this.tsTryParseParamType(
+        super.parseParenItem(node, startPos, startLoc),
+        startPos,
+        startLoc,
+      );
     }
 
     parseExportDeclaration(node: N.ExportNamedDeclaration): ?N.Declaration {
