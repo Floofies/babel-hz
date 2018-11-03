@@ -179,6 +179,7 @@ export const keywords = {
   export: new KeywordTokenType("export"),
   import: new KeywordTokenType("import", { startsExpr }),
   yield: new KeywordTokenType("yield", { beforeExpr, startsExpr }),
+  spawn: new KeywordTokenType("spawn", { beforeExpr, startsExpr }),
   null: new KeywordTokenType("null", { startsExpr }),
   true: new KeywordTokenType("true", { startsExpr }),
   false: new KeywordTokenType("false", { startsExpr }),

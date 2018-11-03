@@ -301,6 +301,10 @@ export function YieldExpression(...args: Array<any>): Object {
   return builder("YieldExpression", ...args);
 }
 export { YieldExpression as yieldExpression };
+export function SpawnExpression(...args: Array<any>): Object {
+  return builder("SpawnExpression", ...args);
+}
+export { SpawnExpression as spawnExpression };
 export function AnyTypeAnnotation(...args: Array<any>): Object {
   return builder("AnyTypeAnnotation", ...args);
 }

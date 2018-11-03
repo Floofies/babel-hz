@@ -172,6 +172,7 @@ function buildYieldAwait(keyword: string) {
 
 export const YieldExpression = buildYieldAwait("yield");
 export const AwaitExpression = buildYieldAwait("await");
+export const SpawnExpression = buildYieldAwait("spawn");
 
 export function EmptyStatement() {
   this.semicolon(true /* force */);

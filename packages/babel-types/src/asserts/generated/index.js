@@ -300,6 +300,9 @@ export function assertTemplateLiteral(node: Object, opts?: Object = {}): void {
 export function assertYieldExpression(node: Object, opts?: Object = {}): void {
   assert("YieldExpression", node, opts);
 }
+export function assertSpawnExpression(node: Object, opts?: Object = {}): void {
+  assert("SpawnExpression", node, opts);
+}
 export function assertAnyTypeAnnotation(
   node: Object,
   opts?: Object = {},

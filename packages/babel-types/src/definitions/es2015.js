@@ -567,3 +567,19 @@ defineType("YieldExpression", {
     },
   },
 });
+
+defineType("SpawnExpression", {
+  builder: ["argument", "delegate"],
+  visitor: ["argument"],
+  aliases: ["Expression", "Terminatorless"],
+  fields: {
+    delegate: {
+      validate: assertValueType("boolean"),
+      default: false,
+    },
+    argument: {
+      optional: true,
+      validate: assertNodeType("Expression"),
+    },
+  },
+});

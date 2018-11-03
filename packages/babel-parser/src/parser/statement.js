@@ -864,7 +864,8 @@ export default class StatementParser extends ExpressionParser {
       isStatement &&
       !optionalId &&
       !this.match(tt.name) &&
-      !this.match(tt._yield)
+      !this.match(tt._yield) &&
+      !this.match(tt.spawn)
     ) {
       this.unexpected();
     }
@@ -878,7 +879,7 @@ export default class StatementParser extends ExpressionParser {
     // Therefore, this.state.inGenerator is set before or after parsing the
     // function id according to the "isStatement" parameter.
     if (!isStatement) this.state.inGenerator = node.generator;
-    if (this.match(tt.name) || this.match(tt._yield)) {
+    if (this.match(tt.name) || this.match(tt._yield) || this.match(tt._spawn)) {
       node.id = this.parseBindingIdentifier();
     }
     if (isStatement) this.state.inGenerator = node.generator;

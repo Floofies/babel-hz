@@ -219,6 +219,7 @@ export default class LValParser extends NodeUtils {
   parseBindingAtom(): Pattern {
     switch (this.state.type) {
       case tt._yield:
+      case tt._spawn:
       case tt.name:
         return this.parseBindingIdentifier();
 

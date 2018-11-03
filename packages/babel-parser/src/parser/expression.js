@@ -127,6 +127,12 @@ export default class ExpressionParser extends LValParser {
         left = afterLeftParse.call(this, left, startPos, startLoc);
       }
       return left;
+    } else if (this.match(tt._spawn)) {
+      let left = this.parseSpawn();
+      if (afterLeftParse) {
+        left = afterLeftParse.call(this, left, startPos, startLoc);
+      }
+      return left;
     }
 
     let failOnShorthandAssign;
@@ -766,6 +772,8 @@ export default class ExpressionParser extends LValParser {
 
       case tt._yield:
         if (this.state.inGenerator) this.unexpected();
+
+      case tt._spawn:
 
       case tt.name: {
         node = this.startNode();
@@ -1955,5 +1963,37 @@ export default class ExpressionParser extends LValParser {
       node.argument = this.parseMaybeAssign();
     }
     return this.finishNode(node, "YieldExpression");
+  }
+
+  // Parses spawn expression
+
+  parseSpawn(): N.YieldExpression {
+    const node = this.startNode();
+
+    if (this.state.inParameters) {
+      this.raise(node.start, "spawn is not allowed in generator parameters");
+    }
+    if (
+      this.state.maybeInArrowParameters &&
+      // We only set yieldInPossibleArrowParameters if we haven't already
+      // found a possible invalid YieldExpression.
+      !this.state.yieldInPossibleArrowParameters
+    ) {
+      this.state.yieldInPossibleArrowParameters = node;
+    }
+
+    this.next();
+    if (
+      this.match(tt.semi) ||
+      this.canInsertSemicolon() ||
+      (!this.match(tt.star) && !this.state.type.startsExpr)
+    ) {
+      node.delegate = false;
+      node.argument = null;
+    } else {
+      node.delegate = this.eat(tt.star);
+      node.argument = this.parseMaybeAssign();
+    }
+    return this.finishNode(node, "SpawnExpression");
   }
 }

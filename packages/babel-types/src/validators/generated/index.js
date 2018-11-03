@@ -1053,6 +1053,20 @@ export function isYieldExpression(node: Object, opts?: Object): boolean {
 
   return false;
 }
+export function isSpawnExpression(node: Object, opts?: Object): boolean {
+  if (!node) return false;
+
+  const nodeType = node.type;
+  if (nodeType === "SpawnExpression") {
+    if (typeof opts === "undefined") {
+      return true;
+    } else {
+      return shallowEqual(node, opts);
+    }
+  }
+
+  return false;
+}
 export function isAnyTypeAnnotation(node: Object, opts?: Object): boolean {
   if (!node) return false;
 
@@ -3143,6 +3157,7 @@ export function isExpression(node: Object, opts?: Object): boolean {
     "TaggedTemplateExpression" === nodeType ||
     "TemplateLiteral" === nodeType ||
     "YieldExpression" === nodeType ||
+    "SpawnExpression" === nodeType ||
     "TypeCastExpression" === nodeType ||
     "JSXElement" === nodeType ||
     "JSXFragment" === nodeType ||
@@ -3338,6 +3353,7 @@ export function isTerminatorless(node: Object, opts?: Object): boolean {
     "ReturnStatement" === nodeType ||
     "ThrowStatement" === nodeType ||
     "YieldExpression" === nodeType ||
+    "SpawnExpression" === nodeType ||
     "AwaitExpression" === nodeType
   ) {
     if (typeof opts === "undefined") {
