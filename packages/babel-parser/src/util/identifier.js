@@ -16,7 +16,7 @@ function makePredicate(words: string): (str: string) => boolean {
 export const reservedWords = {
   "6": makePredicate("enum await"),
   strict: makePredicate(
-    "implements interface let package private protected public static yield spawn",
+    "implements interface let package private protected public static yield",
   ),
   strictBind: makePredicate("eval arguments"),
 };

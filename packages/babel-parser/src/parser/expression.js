@@ -1908,7 +1908,7 @@ export default class ExpressionParser extends LValParser {
       );
     }
 
-    if (this.isReservedWord(word) || (checkKeywords && this.isKeyword(word))) {
+    if (this.isReservedWord(word) || (checkKeywords && this.isKeyword(word) && word !== "spawn")) {
       this.raise(startLoc, word + " is a reserved word");
     }
   }
@@ -1967,7 +1967,7 @@ export default class ExpressionParser extends LValParser {
 
   // Parses spawn expression
 
-  parseSpawn(): N.YieldExpression {
+  parseSpawn(): N.SpawnExpression {
     const node = this.startNode();
 
     if (this.state.inParameters) {
