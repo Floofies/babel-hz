@@ -1908,7 +1908,10 @@ export default class ExpressionParser extends LValParser {
       );
     }
 
-    if (this.isReservedWord(word) || (checkKeywords && this.isKeyword(word) && word !== "spawn")) {
+    if (
+      this.isReservedWord(word) ||
+      (checkKeywords && this.isKeyword(word) && word !== "spawn")
+    ) {
       this.raise(startLoc, word + " is a reserved word");
     }
   }
